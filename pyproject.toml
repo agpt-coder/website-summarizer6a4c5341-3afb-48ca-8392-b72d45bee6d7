@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "website-summarizer"
+version = "0.1.0"
+description = "To develop a website parser that parses all pages of a given website and sends the extracted information to Claude 3 Opus for content summarization, follow these comprehensive steps using the recommended tech stack (Python, FastAPI, PostgreSQL, and Prisma):"
+authors = ["AutoGPT <info@agpt.co>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11"
+fastapi = "^0.75.0"
+httpx = "^0.23.0"
+prisma = "*"
+pydantic = "*"
+uvicorn = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

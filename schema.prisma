@@ -1,0 +1,71 @@
+// datasource db defines the database connection settings.
+// It is configured for PostgreSQL and uses an environment variable for the connection URL.
+// The 'extensions' feature enables the use of PostgreSQL-specific data types.
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+// generator db configures Prisma Client settings.
+// It is set up to use Prisma Client Python with asyncio interface and specific features.
+generator db {
+  provider             = "prisma-client-py"
+  interface            = "asyncio"
+  recursive_type_depth = 5
+  previewFeatures      = ["postgresqlExtensions"]
+}
+
+model User {
+  id          String       @id @default(dbgenerated("gen_random_uuid()"))
+  email       String       @unique
+  password    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  role        Role
+  sessions    Session[]
+  parsedSites ParsedSite[]
+}
+
+model Session {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  valid     Boolean  @default(true)
+  userAgent String?
+  ipAddress String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ParsedSite {
+  id               String           @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  url              String
+  status           ParsedSiteStatus
+  userId           String
+  contentSummaries ContentSummary[]
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ContentSummary {
+  id           String     @id @default(dbgenerated("gen_random_uuid()"))
+  createdAt    DateTime   @default(now())
+  content      String
+  summary      String?
+  parsedSiteId String
+  parsedSite   ParsedSite @relation(fields: [parsedSiteId], references: [id], onDelete: Cascade)
+}
+
+enum ParsedSiteStatus {
+  PENDING
+  COMPLETED
+  ERROR
+}
+
+enum Role {
+  User
+  PremiumUser
+  Admin
+}
+
